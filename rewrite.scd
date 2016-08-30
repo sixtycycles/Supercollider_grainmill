@@ -1,6 +1,6 @@
 (
 //globes
-var buf,seconds,bufnum,envelopeSelect;
+var buf,seconds,bufnum,envelopeSelect,conductor,doThing;
 //window to hold stuff
 var window = Window.new("Select Buffer").front;
 //select between soundfiles
@@ -26,6 +26,34 @@ envelopeSelect = PopUpMenu(window,Rect(10, 40,150,20)).background_(Color.white);
 envelopeSelect.items = ["sine","triangle","welch","linen","perc"];
 envelopeSelect.action = {|sbs| Pdef(\a).set(\instrument,sbs.value);};
 
+//buttons to change states?
+doThing = Button(window,Rect(10,100,50,20));
+doThing.states =[["changeitup",Color.blue]];
+doThing.action{Pdef(\a).set(\dur,Pseq((0.003,0.0031..0.009),inf))};
+
+Pdef(\a,Pbind(*[
+	instrument:\sine,
+	dur: Pseg((0.005,0.0055..0.05),0.01,'exp',inf),
+	legato: Pseq([5],inf),
+	rate: 2,
+	startPos: Pseg((0.0001,0.0002..1.0),0.005,'exp',inf),
+	\amp:0.5
+	])
+);
+
+
+//end
+)
+
+
+
+Pdef(\a).play;
+Pdef(\a).stop;
+
+
+
+//load first
+(
 //synths!
 SynthDef("sine", {
 		|out, bufnum = 0, rate = 1, startPos = 0, sustain = 1, loop = 1, amp = 0.25,lag = 1, pan = 0.0 |
@@ -86,19 +114,8 @@ SynthDef("triangle", {
 		OffsetOut.ar(out, Pan2.ar(audio*env,pan));
 	}).store;
 
+
 )
-//pattern def default
-Pdef(\a,Pbind(*[
-	instrument:\sine,
-	dur: Pseg((0.005,0.0055..0.05),0.001,'sin',inf),
-	legato: Pseq([2],inf),
-	rate: 1,
-	startPos: Pseg((0.0001,0.0002..1.0),0.05,'exp',inf),
-		out: 0,
-	\amp:0.5
-	])
-);
 
-Pdef(\a).play;
 
-Pdef(\a).stop;
+	
